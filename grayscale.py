@@ -23,5 +23,4 @@ def convert_folder_to_grayscale(input_folder, output_folder="./sortie_bw/"):
 
         print(f"🖤 Noir & blanc -> {output_path}")
         
-
-convert_folder_to_grayscale("./sortie/", "./sortie_bw/")
+convert_folder_to_grayscale("./storage/removed_bg/", "./storage/grayscaled/")
