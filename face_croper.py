@@ -245,4 +245,4 @@ def process_dataset(input_folder, output_folder, start_index=None, end_index=Non
 # =========================
 # RUN
 # =========================
-process_dataset("./PB/PHOTO_AID_10MARS_27AVRIL", "./PB/CROP_AID_10MARS_27AVRIL")
+process_dataset("./PB/MSD_GUEDIAWAYE/PHOTO", "./PB/MSD_GUEDIAWAYE/CROP")
