@@ -116,7 +116,7 @@ def normalize_face(img, x, y, w, h, output_size=224, face_ratio=0.70):
 # =========================
 def save_anomaly(path, folder, file, reason):
     name, ext = os.path.splitext(file)
-    new_name = f"{name}__{reason}{ext}"
+    new_name = f"{name}{ext}"
     shutil.copy(path, os.path.join(folder, new_name))
     log(f"❌ ANOMALIE: {file} -> {reason}")
 
@@ -135,11 +135,16 @@ def save_image(output_path, img):
 
     log(f"💾 Sauvegardé PNG  → {base}")
 
-
+def extract_number(filename):
+    name, _ = os.path.splitext(filename)
+    try:
+        return int(name)
+    except:
+        return None
 # =========================
 # PIPELINE PRINCIPAL
 # =========================
-def process_dataset(input_folder, output_folder):
+def process_dataset(input_folder, output_folder, start_index=None, end_index=None):
 
     os.makedirs(output_folder, exist_ok=True)
     anomaly_folder = os.path.join(output_folder, "anomalies")
@@ -149,11 +154,42 @@ def process_dataset(input_folder, output_folder):
         cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
     )
 
-    files = [f for f in os.listdir(input_folder)
-             if f.lower().endswith((".jpg", ".jpeg", ".png"))]
+    # ========== DEBUT =======================
+    all_files = [f for f in os.listdir(input_folder)
+                if f.lower().endswith((".jpg", ".jpeg", ".png"))]
 
+    # 🔥 récupération des numéros
+    files_with_numbers = []
+    for f in all_files:
+        num = extract_number(f)
+        if num is None:
+            continue
+        files_with_numbers.append((num, f))
+
+    # 🔥 tri
+    files_with_numbers.sort(key=lambda x: x[0])
+
+    # 🔥 bornes auto
+    if files_with_numbers:
+        min_num = files_with_numbers[0][0]
+        max_num = files_with_numbers[-1][0]
+    else:
+        log("❌ Aucun fichier valide")
+        return
+
+    if start_index is None:
+        start_index = min_num
+
+    if end_index is None:
+        end_index = max_num
+
+    # 🔥 filtrage final
+    files = [
+        f for (num, f) in files_with_numbers
+        if start_index <= num <= end_index
+    ]
+    
     success, failed = 0, 0
-
     for file in files:
         path = os.path.join(input_folder, file)
 
@@ -203,10 +239,10 @@ def process_dataset(input_folder, output_folder):
             failed += 1
 
     log("\n==============================")
-    log(f"FINISHED → OK: {success} | FAIL: {failed}")
+    log(f"FINISHED → SUCCESS : {(success)} - {(success/(success+failed))*100}% | FAIL : {failed} - {(failed/(success+failed))*100}%")
 
 
 # =========================
 # RUN
 # =========================
-process_dataset("./storage/images/", "./storage/cropped/")
+process_dataset("./PB/PHOTO_AID_10MARS_27AVRIL", "./PB/CROP_AID_10MARS_27AVRIL")

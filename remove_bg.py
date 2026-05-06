@@ -1,8 +1,10 @@
 import os
 import cv2
 import numpy as np
+import argparse
 from rembg import remove, new_session
 from PIL import Image
+
 
 # 🔥 créer UNE seule session (important pour perf)
 session = new_session("u2net_human_seg")
@@ -43,7 +45,7 @@ def remove_background_white(input_path, output_path):
         raise RuntimeError(f"Erreur traitement image : {e}")
 
 
-def process_folder(input_folder="./storage/cropped/", output_folder="./storage/removed_bg/"):
+def process_folder(input_folder, output_folder):
     os.makedirs(output_folder, exist_ok=True)
 
     files = [f for f in os.listdir(input_folder)
@@ -60,5 +62,13 @@ def process_folder(input_folder="./storage/cropped/", output_folder="./storage/r
             print(f"❌ {file} : {e}")
 
 
+
 if __name__ == "__main__":
-    process_folder("./storage/cropped/", "./storage/removed_bg/")
+    parser = argparse.ArgumentParser(description="Remove background and set white background")
+
+    parser.add_argument("input", help="Dossier d'entrée")
+    parser.add_argument("output", help="Dossier de sortie")
+
+    args = parser.parse_args()
+
+    process_folder(args.input, args.output)
